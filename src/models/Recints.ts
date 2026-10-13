@@ -12,7 +12,6 @@ export class Recints extends Model<InferAttributes<Recints>, InferCreationAttrib
   declare security: string;
   declare capacity: number;
   declare status: number;
-  declare available: CreationOptional<boolean>;
 }
 
 Recints.init(
@@ -21,7 +20,6 @@ Recints.init(
     security: { type: DataTypes.STRING(200), allowNull: false },
     capacity: { type: DataTypes.INTEGER, allowNull: false },
     status: { type: DataTypes.INTEGER, allowNull: false },
-    available: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   },
   { sequelize, tableName: "recints", timestamps: false }
 );

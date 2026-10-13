@@ -12,7 +12,6 @@ export class Dinos extends Model<InferAttributes<Dinos>, InferCreationAttributes
   declare specie: string;
   declare name: string;
   declare recint_id: number;
-  declare available: CreationOptional<boolean>;
 }
 
 Dinos.init(
@@ -21,7 +20,6 @@ Dinos.init(
     specie: { type: DataTypes.STRING(200), allowNull: false },
     name: { type: DataTypes.STRING(200), allowNull: false },
     recint_id: { type: DataTypes.INTEGER, allowNull: false },
-    available: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   },
   { sequelize, tableName: "dinos", timestamps: false }
 );
