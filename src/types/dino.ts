@@ -4,3 +4,9 @@ export interface Dinosaur {
     name: string;
     recint_id: number;
 }
+
+export interface newDinosaur {
+    species: string;
+    name: string;
+    recint_id: number;
+}
