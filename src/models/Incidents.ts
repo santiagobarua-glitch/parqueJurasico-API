@@ -13,7 +13,7 @@ export class Incident extends Model<InferAttributes<Incident>, InferCreationAttr
   declare date_time: string;
   declare description: string;
   declare dino_id: number;
-  declare available: CreationOptional<boolean>;
+  declare recint_id: number;
 }
 
 Incident.init(
@@ -21,8 +21,8 @@ Incident.init(
     incident_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     date_time: { type: DataTypes.STRING(200), allowNull: false },
     description: { type: DataTypes.STRING(200), allowNull: false },
-    dino_id: { type: DataTypes.INTEGER, allowNull: false },
-    available: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+    dino_id: { type: DataTypes.INTEGER, allowNull: true },
+    recint_id: { type: DataTypes.INTEGER, allowNull: true },
   },
   { sequelize, tableName: "incidents", timestamps: false }
 );
