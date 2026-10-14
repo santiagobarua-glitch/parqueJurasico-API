@@ -422,7 +422,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Incidente'
+                $ref: '#/components/schemas/Incident'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -495,6 +495,25 @@ parameters:
     in: path
     required: true
     minimum: 1
+    Page:
+      name: page
+      in: query
+      required: false
+      description: Page number, starting at 1
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      required: false
+      description: Maximum number of results per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
 
 
     DinosaurInput:
@@ -534,7 +553,7 @@ parameters:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Dinosaurio'
+            $ref: '#/components/schemas/Dinosaur'
         pagination:
           type: object
           required: [page, limit, total, totalPages]
