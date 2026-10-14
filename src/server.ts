@@ -1,4 +1,4 @@
-import "dotenv/config";
+import process from "node:process";
 import express, { type Request, type Response } from "express";
 import swaggerUi from "swagger-ui-express";
 import { sequelize } from "./db/connection.js";
@@ -25,11 +25,16 @@ app.use(
 );
 
 async function start() {
-  await sequelize.authenticate();
-  app.listen(PORT, () => {
-    console.log(`Server listening on http://localhost:${PORT}`);
-    console.log(`Docs available at    http://localhost:${PORT}/api-docs`);
-  });
+  try {
+    await sequelize.authenticate();
+    console.log("Postgre conectado");
+    app.listen(PORT, () => {
+      console.log(`Server listening on http://localhost:${PORT}`);
+      console.log(`Docs available at    http://localhost:${PORT}/api-docs`);
+    });
+  } catch (error) {
+    console.error("No se pudo conectar a Postgre:", error);
+  }
 }
 
 start();
