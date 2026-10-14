@@ -1,0 +1,619 @@
+openapi: 3.0.3
+info:
+  title: Parque de Dinosaurs API
+  version: 1.0.0
+  description: |
+    dinosaur
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+tags:
+  - name: Authentication
+  - name: Recints
+  - name: Dinosaurs
+  - name: Incidents
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/register:
+    post:
+      tags: [Authentication]
+      summary: Register a user
+      description: Creates an account with the user role. 
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+              example:
+                message: User registered successfully
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: The username or email is already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: The email is already registered
+
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Log in
+      description: Validates credentials
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Incorrect email or password
+
+  /recints:
+    get:
+      tags: [Recints]
+      summary: List all recints
+      responses:
+        '200':
+          description: List of recints
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Recint'
+              example:
+                data:
+                  - recint_id: 1
+                    security: High
+                    capacity: 8
+                    status: 1
+                  - recint_id: 2
+                    security: Medium
+                    capacity: 12
+                    status: 1
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Recints]
+      summary: Create an recints
+      description: Requires admin 
+      security:
+        - bearerAuth: []
+      x-required-role: admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecintInput'
+      responses:
+        '201':
+          description: Recints created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recint'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /recints/{id}:
+    parameters:
+      - $ref: '#/components/parameters/RecintsId'
+    get:
+      tags: [Recints]
+      summary: Get recint by ID
+      responses:
+        '200':
+          description: Recints found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recints'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Recints]
+      summary: Replace an recint
+      description: Requires the admin role.
+      x-required-role: admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecintsInput'
+
+      responses:
+        '200':
+          description: Recint updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recint'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Recints]
+      summary: Partially update an recint
+      description: Requires the admin role
+      x-required-role: admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecintPatch'
+
+      responses:
+        '200':
+          description: Recint updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recint'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Recints]
+      summary: Delete an recint
+      description: Requires the admin role. 
+      x-required-role: admin
+      responses:
+        '204':
+          description: Recint deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /dinosaur:
+    get:
+      tags: [Dinosaurs]
+      summary: List and search dinosaurs
+      description: |
+        List of all dinosaurs
+      parameters:
+        - name: species
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: recint_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          example: 1
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DinosaurSearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Dinosaurs]
+      summary: Create a dinosaur
+      description: Requires admin
+      x-required-role: admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DinosaurInput'
+
+      responses:
+        '201':
+          description: Dinosaur created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dinosaur'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /dinosaur/{id}:
+    parameters:
+      - $ref: '#/components/parameters/DinosaurId'
+    get:
+      tags: [Dinosaurs]
+      summary: Get a dinosaur by ID
+      responses:
+        '200':
+          description: Dinosaur found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dinosaur'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Dinosaurs]
+      summary: Replace a dinosaur
+      description: Requires admin role
+      x-required-role: admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DinosaurInput'
+
+      responses:
+        '200':
+          description: Dinosaur updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dinosaur'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Dinosaurs]
+      summary: Partially update a dinosaur
+      description: Requires admin role
+      x-required-role: admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DinosaurPatch'
+
+      responses:
+        '200':
+          description: Dinosaur updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dinosaur'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Dinosaurs]
+      summary: Delete a dinosaur
+      description: Requires admin role
+      x-required-role: admin
+      responses:
+        '204':
+          description: Dinosaur deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    /incidents/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IncidentId'
+    get:
+      tags: [Incidents]
+      summary: Get an incident by ID
+      responses:
+        '200':
+          description: Incident found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Incidents]
+      summary: Replace an incident
+      description: Requires admin role
+      x-required-role: admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentInput'
+    responses:
+        '200':
+          description: Incident updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incidente'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Incidents]
+      summary: Partially update an incident
+      description: Requires admin role
+      x-required-role: admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentPatch'
+
+      responses:
+        '200':
+          description: Incident updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Incidents]
+      summary: Delete an incident
+      description: Requires the admin role.
+      x-required-role: admin
+      responses:
+        '204':
+          description: Incident deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components: 
+
+parameters: 
+  recintId:
+    name: id
+    in: path
+    required: true
+    schema: 
+    type: integer
+    minimum: 1
+  DinosaurId:
+    name: id
+    in: path
+    required: true
+    schema:
+    type: integer
+    minimum: 1
+  IncidentId:
+    name: id
+    in: path
+    required: true
+    minimum: 1
+
+
+    DinosaurInput:
+      type: object
+      additionalProperties: false
+      required: [species, name, recint_id]
+      properties:
+        species:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    DinosaurPatch:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        species:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    DinosaurSearchResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dinosaurio'
+        pagination:
+          type: object
+          required: [page, limit, total, totalPages]
+          properties:
+            page:
+              type: integer
+              minimum: 1
+            limit:
+              type: integer
+              minimum: 1
+            total:
+              type: integer
+              minimum: 0
+            totalPages:
+              type: integer
+              minimum: 0
+
+    Incident:
+      type: object
+      required: [incident_id, date_time, description, dino_id, recint_id]
+      properties:
+        incident_id:
+          type: integer
+          readOnly: true
+        date_time:
+          type: string
+          format: date-time
+          example: '2026-10-12T14:30:00Z'
+        description:
+          type: string
+          minLength: 1
+          example: A break was detected in the north fence.
+        dino_id:
+          type: integer
+          minimum: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    IncidentInput:
+      type: object
+      additionalProperties: false
+      required: [date_time, description, dino_id, recint_id]
+      properties:
+        date_time:
+          type: string
+          format: date-time
+        description:
+          type: string
+          minLength: 1
+        dino_id:
+          type: integer
+          minimum: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    IncidentPatch:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        date_time:
+          type: string
+          format: date-time
+        description:
+          type: string
+          minLength: 1
+        dino_id:
+          type: integer
+          minimum: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          example: Resource not found
