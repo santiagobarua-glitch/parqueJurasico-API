@@ -2,9 +2,9 @@ import {Op} from "sequelize"
 import {Dinos} from "../models/Dinos"
 
 interface DinoFilters{
-    species: string
-    name: string
-    recint_id: number
+    species?: string
+    name?: string
+    recint_id?: number
     page: number
     limit: number
 }
@@ -77,7 +77,7 @@ async create( data: {
 },
 async update(
     id: number,
-    data: {species: string, name: string, recint_id: number}
+    data: {species?: string, name?: string, recint_id?: number}
 ){
     const dino = await Dinos.findByPk(id);
 
