@@ -472,3 +472,148 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+
+components: 
+
+parameters: 
+  recintId:
+    name: id
+    in: path
+    required: true
+    schema: 
+    type: integer
+    minimum: 1
+  DinosaurId:
+    name: id
+    in: path
+    required: true
+    schema:
+    type: integer
+    minimum: 1
+  IncidentId:
+    name: id
+    in: path
+    required: true
+    minimum: 1
+
+
+    DinosaurInput:
+      type: object
+      additionalProperties: false
+      required: [species, name, recint_id]
+      properties:
+        species:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    DinosaurPatch:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        species:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    DinosaurSearchResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dinosaurio'
+        pagination:
+          type: object
+          required: [page, limit, total, totalPages]
+          properties:
+            page:
+              type: integer
+              minimum: 1
+            limit:
+              type: integer
+              minimum: 1
+            total:
+              type: integer
+              minimum: 0
+            totalPages:
+              type: integer
+              minimum: 0
+
+    Incident:
+      type: object
+      required: [incident_id, date_time, description, dino_id, recint_id]
+      properties:
+        incident_id:
+          type: integer
+          readOnly: true
+        date_time:
+          type: string
+          format: date-time
+          example: '2026-10-12T14:30:00Z'
+        description:
+          type: string
+          minLength: 1
+          example: A break was detected in the north fence.
+        dino_id:
+          type: integer
+          minimum: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    IncidentInput:
+      type: object
+      additionalProperties: false
+      required: [date_time, description, dino_id, recint_id]
+      properties:
+        date_time:
+          type: string
+          format: date-time
+        description:
+          type: string
+          minLength: 1
+        dino_id:
+          type: integer
+          minimum: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    IncidentPatch:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        date_time:
+          type: string
+          format: date-time
+        description:
+          type: string
+          minLength: 1
+        dino_id:
+          type: integer
+          minimum: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          example: Resource not found
