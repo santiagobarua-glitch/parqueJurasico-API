@@ -4,3 +4,9 @@ export interface Recint {
     capacity: number;
     status: number;
 }
+
+export interface NewRecint {
+    security: string;
+    capacity: number;
+    status: number;
+}

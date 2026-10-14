@@ -14,6 +14,8 @@ export class Incident extends Model<InferAttributes<Incident>, InferCreationAttr
   declare description: string;
   declare dino_id: number;
   declare recint_id: number;
+  declare reported_by: string;
+  declare managed_by: string;
 }
 
 Incident.init(
@@ -23,6 +25,8 @@ Incident.init(
     description: { type: DataTypes.STRING(200), allowNull: false },
     dino_id: { type: DataTypes.INTEGER, allowNull: true },
     recint_id: { type: DataTypes.INTEGER, allowNull: true },
+    reported_by: { type: DataTypes.STRING(200), allowNull: false },
+    managed_by: { type: DataTypes.STRING(200), allowNull: true },
   },
   { sequelize, tableName: "incidents", timestamps: false }
 );
