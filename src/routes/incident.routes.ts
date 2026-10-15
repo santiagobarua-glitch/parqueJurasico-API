@@ -78,9 +78,10 @@ router.post(
         res.status(401).json({ message: "Autenticación requerida" });
         return;
       }
-      const { date_time, description, dino_id, recint_id } = body;
+      const {description, dino_id, recint_id } = body;
+      const incidentDateTime = new Date().toISOString();
       if (
-        !isDateTime(date_time) ||
+        !isDateTime(incidentDateTime) ||
         typeof description !== "string" ||
         !description.trim() ||
         !isPositiveId(dino_id) ||
@@ -91,7 +92,7 @@ router.post(
       }
 
       const incident = await IncidentRepository.create({
-        date_time,
+        date_time: incidentDateTime,
         description: description.trim(),
         dino_id,
         recint_id,
