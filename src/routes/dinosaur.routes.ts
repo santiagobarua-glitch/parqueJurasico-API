@@ -29,15 +29,9 @@ router.get("/", async (req: Request, res: Response) => {
     }
 
     const result = await DinoRepository.findAll({
-      species: typeof req.query.species === "string"
-        ? req.query.species
-        : undefined,
-      name: typeof req.query.name === "string"
-        ? req.query.name
-        : undefined,
-      recint_id: recintId,
-      page,
-      limit,
+      species: typeof req.query.species === "string" ? req.query.species : undefined,
+      name: typeof req.query.name === "string" ? req.query.name : undefined,
+      recint_id: recintId, page, limit,
     });
 
     res.status(200).json(result);
@@ -101,11 +95,8 @@ router.post("/", authorizeRole("admin"), async (req: Request, res: Response) => 
   }
 });
 
-router.put(
-  "/:id",
-  authorizeRole("admin"),
-  async (req: Request, res: Response) => {
-    try {
+const updateDinosaur = async (req: Request, res: Response) => {
+  try {
       const id = Number(req.params.id);
 
       if (!Number.isInteger(id) || id < 1) {
@@ -146,8 +137,10 @@ router.put(
     } catch {
       res.status(500).json({ message: "Error al actualizar el dinosaurio" });
     }
-  }
-);
+};
+
+router.put("/:id", authorizeRole("admin"), updateDinosaur);
+router.patch("/:id", authorizeRole("admin"), updateDinosaur);
 
 router.delete(
   "/:id",
