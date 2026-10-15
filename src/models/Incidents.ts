@@ -21,7 +21,7 @@ export class Incident extends Model<InferAttributes<Incident>, InferCreationAttr
 Incident.init(
   {
     incident_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    date_time: { type: DataTypes.STRING(200), allowNull: false },
+    date_time: { type: DataTypes.STRING(200), allowNull: true },
     description: { type: DataTypes.STRING(200), allowNull: false },
     dino_id: { type: DataTypes.INTEGER, allowNull: true },
     recint_id: { type: DataTypes.INTEGER, allowNull: true },
