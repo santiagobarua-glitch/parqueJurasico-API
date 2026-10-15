@@ -2,6 +2,7 @@ import process from "node:process";
 import express, { type Request, type Response } from "express";
 import swaggerUi from "swagger-ui-express";
 import { sequelize } from "./db/connection.js";
+import authRoutes from "./routes/auth.route.js";
 import dinosaurRoutes from "./routes/dinosaur.routes.js";
 import incidentRoutes from "./routes/incident.routes.js";
 import recintRoutes from "./routes/recint.routes.js";
@@ -11,6 +12,7 @@ const PORT = 3000;
 
 app.use(express.json());
 app.use("/docs", express.static("docs"));
+app.use("/auth", authRoutes);
 app.use("/dinosaur", dinosaurRoutes);
 app.use("/recints", recintRoutes);
 app.use("/incidents", incidentRoutes);
