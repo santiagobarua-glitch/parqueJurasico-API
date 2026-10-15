@@ -1,7 +1,7 @@
 import { Router } from "express";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { Usuario } from '../models/Users.js'
+import { User } from '../models/Users.js'
 
 const router = Router();
 
@@ -10,7 +10,7 @@ router.post('/register', async (req, res) => {
   const { email, password, role = 'user' } = req.body;
   try {
     const passwordHash = await bcrypt.hash(password, 10);
-    await Usuario.create({ email, password_hash: passwordHash, role });
+    await User.create({ email, password_hash: passwordHash, role });
     res.status(201).json({ message: "Usuario registrado con éxito" });
   } catch (error) {
     console.error(error);
@@ -23,7 +23,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
-    const usuario = await Usuario.findOne({ where: { email } });
+    const usuario = await User.findOne({ where: { email } });
 
     if (!usuario) {
       return res.status(400).json({ message: "Usuario no encontrado" });
