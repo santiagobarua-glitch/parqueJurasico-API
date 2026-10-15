@@ -2,12 +2,18 @@ import "dotenv/config";
 import express, { type Request, type Response } from "express";
 import swaggerUi from "swagger-ui-express";
 import { sequelize } from "./db/connection.js";
+import dinosaurRoutes from "./routes/dinosaur.routes.js";
+import incidentRoutes from "./routes/incident.routes.js";
+import recintRoutes from "./routes/recint.routes.js";
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
 app.use("/docs", express.static("docs"));
+app.use("/dinosaur", dinosaurRoutes);
+app.use("/recints", recintRoutes);
+app.use("/incidents", incidentRoutes);
 
 app.get("/", (_req: Request, res: Response) => {
   res.json({
