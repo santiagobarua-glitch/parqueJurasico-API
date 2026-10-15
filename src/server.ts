@@ -1,4 +1,4 @@
-import process from "node:process";
+import "dotenv/config";
 import express, { type Request, type Response } from "express";
 import swaggerUi from "swagger-ui-express";
 import { sequelize } from "./db/connection.js";
