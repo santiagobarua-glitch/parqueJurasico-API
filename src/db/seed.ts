@@ -3,7 +3,10 @@ import { sequelize } from "./connection.js";
 import { Dinos } from "../models/Dinos.js";
 import { Incident } from "../models/Incidents.js";
 import { Recints } from "../models/Recints.js";
-import { Usuario } from "../models/Users.js";
+import { User } from "../models/Users.js";
+import bcrypt from "bcrypt";
+
+
 
 async function seed() {
   try {
@@ -36,12 +39,20 @@ async function seed() {
       },
     ];
 
+    const passwordHash = await bcrypt.hash("password", 10);
+
+    const users = await User.bulkCreate([
+      { email: "rex@example.com", password_hash: passwordHash, role: "user" },
+      { email: "tric@example.com", password_hash: passwordHash, role: "user" },
+    ]);
+
     await Incident.bulkCreate(incidentRows as unknown as CreationAttributes<Incident>[]);
 
     console.log("Base de datos creada y cargada:");
     console.log(`  ${await Recints.count()} recintos`);
     console.log(`  ${await Dinos.count()} dinosaurios`);
     console.log(`  ${await Incident.count()} incidentes`);
+    
   } finally {
     await sequelize.close();
   }
