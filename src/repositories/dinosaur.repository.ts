@@ -9,7 +9,7 @@ interface DinoFilters{
     limit: number
 }
 
-export const DinoRepository ={
+export const DinoRepository = {
     async findAll(filters: DinoFilters){
         const {species, name, recint_id, page, limit} = filters
 
@@ -76,7 +76,7 @@ async create( data: {
     }
 },
 async update(
-    id: number,
+   id: number,
     data: {species?: string, name?: string, recint_id?: number}
 ){
     const dino = await Dinos.findByPk(id);
