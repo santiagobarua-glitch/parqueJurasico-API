@@ -5,7 +5,7 @@ import {
   InferCreationAttributes,
   CreationOptional,
 } from "sequelize";
-import { sequelize } from "../db/connection.js";
+import { sequelize } from "../db/connection.ts";
 
 export class Dinos extends Model<InferAttributes<Dinos>, InferCreationAttributes<Dinos>> {
   declare dino_id: CreationOptional<number>;
