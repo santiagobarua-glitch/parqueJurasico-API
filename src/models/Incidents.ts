@@ -12,10 +12,10 @@ export class Incident extends Model<InferAttributes<Incident>, InferCreationAttr
   declare incident_id: CreationOptional<number>;
   declare date_time: string;
   declare description: string;
-  declare dino_id: number;
-  declare recint_id: number;
+  declare dino_id: number | null;
+  declare recint_id: number | null;
   declare reported_by: string;
-  declare managed_by: string;
+  declare managed_by: string | null;
 }
 
 Incident.init(
