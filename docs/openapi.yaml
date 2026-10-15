@@ -416,5 +416,223 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/IncidentInput'
+    responses:
+        '200':
+          description: Incident updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Incidents]
+      summary: Partially update an incident
+      description: Requires admin role
+      x-required-role: admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentPatch'
+
       responses:
         '200':
+          description: Incident updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Incidents]
+      summary: Delete an incident
+      description: Requires the admin role.
+      x-required-role: admin
+      responses:
+        '204':
+          description: Incident deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components: 
+
+parameters: 
+  recintId:
+    name: id
+    in: path
+    required: true
+    schema: 
+    type: integer
+    minimum: 1
+  DinosaurId:
+    name: id
+    in: path
+    required: true
+    schema:
+    type: integer
+    minimum: 1
+  IncidentId:
+    name: id
+    in: path
+    required: true
+    minimum: 1
+    Page:
+      name: page
+      in: query
+      required: false
+      description: Page number, starting at 1
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      required: false
+      description: Maximum number of results per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+
+
+    DinosaurInput:
+      type: object
+      additionalProperties: false
+      required: [species, name, recint_id]
+      properties:
+        species:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    DinosaurPatch:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        species:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    DinosaurSearchResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dinosaur'
+        pagination:
+          type: object
+          required: [page, limit, total, totalPages]
+          properties:
+            page:
+              type: integer
+              minimum: 1
+            limit:
+              type: integer
+              minimum: 1
+            total:
+              type: integer
+              minimum: 0
+            totalPages:
+              type: integer
+              minimum: 0
+
+    Incident:
+      type: object
+      required: [incident_id, date_time, description, dino_id, recint_id]
+      properties:
+        incident_id:
+          type: integer
+          readOnly: true
+        date_time:
+          type: string
+          format: date-time
+          example: '2026-10-12T14:30:00Z'
+        description:
+          type: string
+          minLength: 1
+          example: A break was detected in the north fence.
+        dino_id:
+          type: integer
+          minimum: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    IncidentInput:
+      type: object
+      additionalProperties: false
+      required: [date_time, description, dino_id, recint_id]
+      properties:
+        date_time:
+          type: string
+          format: date-time
+        description:
+          type: string
+          minLength: 1
+        dino_id:
+          type: integer
+          minimum: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    IncidentPatch:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        date_time:
+          type: string
+          format: date-time
+        description:
+          type: string
+          minLength: 1
+        dino_id:
+          type: integer
+          minimum: 1
+        recint_id:
+          type: integer
+          minimum: 1
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          example: Resource not found
