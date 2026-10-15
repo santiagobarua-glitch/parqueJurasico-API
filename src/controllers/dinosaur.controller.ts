@@ -1,5 +1,12 @@
-import {Router, Request, Response} from "express";
-import { DinoRepository } from "../repositories/dinosaur.repository.js";
+import type { Request, Response } from "express";
+import {
+  RecintNotFoundError,
+  createDino,
+  getDino,
+  listDinos,
+  removeDino,
+  updateDino,
+} from "../services/dinosaur.service.js";
 
 
 export async function getDinos (req: Request, res: Response) {
@@ -24,7 +31,7 @@ export async function getDinos (req: Request, res: Response) {
       return;
     }
 
-    const result = await DinoRepository.findAll({
+    const result = await listDinos({
       species: typeof req.query.species === "string" ? req.query.species : undefined,
       name: typeof req.query.name === "string" ? req.query.name : undefined,
       recint_id: recintId, page, limit,
@@ -46,7 +53,7 @@ export async function getDinoByID (req: Request, res: Response) {
       return;
     }
 
-    const dino = await DinoRepository.findById(id);
+    const dino = await getDino(id);
 
     if (!dino) {
       res.status(404).json({ message: "Dinosaurio no encontrado" });
@@ -79,14 +86,18 @@ export async function getDinoByID (req: Request, res: Response) {
       return;
     }
 
-    const dino = await DinoRepository.create({
+    const dino = await createDino({
       species: species.trim(),
       name: name.trim(),
       recint_id: Number(recint_id),
     });
 
     res.status(201).json(dino);
-  } catch {
+  } catch (error) {
+    if (error instanceof RecintNotFoundError) {
+      res.status(400).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: "Error al crear el dinosaurio" });
   }
 };
@@ -118,7 +129,7 @@ export async function patchDino (req: Request, res: Response) {
         return;
       }
 
-      const dino = await DinoRepository.update(id, {
+      const dino = await updateDino(id, {
         ...(species !== undefined ? { species: species as string } : {}),
         ...(name !== undefined ? { name: name as string } : {}),
         ...(recint_id !== undefined ? { recint_id: Number(recint_id) } : {}),
@@ -130,7 +141,11 @@ export async function patchDino (req: Request, res: Response) {
       }
 
       res.status(200).json(dino);
-    } catch {
+    } catch (error) {
+      if (error instanceof RecintNotFoundError) {
+        res.status(400).json({ message: error.message });
+        return;
+      }
       res.status(500).json({ message: "Error al actualizar el dinosaurio" });
     }
 };
@@ -145,7 +160,7 @@ export async function patchDino (req: Request, res: Response) {
         return;
       }
 
-      const deleted = await DinoRepository.delete(id);
+      const deleted = await removeDino(id);
 
       if (!deleted) {
         res.status(404).json({ message: "Dinosaurio no encontrado" });
