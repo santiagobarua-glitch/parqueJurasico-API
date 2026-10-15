@@ -387,6 +387,55 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
 
+  /incidents:
+    get:
+      tags: [Incidents]
+      summary: List all incidents
+      responses:
+        '200':
+          description: List of incidents
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Incident'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Incidents]
+      summary: Report an incident
+      description: |
+        Any authenticated user can report an incident. The date_time is set
+        by the server and the reporter is taken from the token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentCreate'
+      responses:
+        '201':
+          description: Incident created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Dinosaur or recint not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /incidents/{id}:
     parameters:
       - $ref: '#/components/parameters/IncidentId'
@@ -681,6 +730,20 @@ components:
         date_time:
           type: string
           format: date-time
+        description:
+          type: string
+          minLength: 1
+        dino_id:
+          type: integer
+          minimum: 1
+        recint_id:
+          type: integer
+          minimum: 1
+    IncidentCreate:
+      type: object
+      additionalProperties: false
+      required: [description, dino_id, recint_id]
+      properties:
         description:
           type: string
           minLength: 1
