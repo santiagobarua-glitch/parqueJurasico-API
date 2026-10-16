@@ -9,7 +9,11 @@ import recintRoutes from "./routes/recint.routes.js";
 import "dotenv/config"
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT);
+
+if (!PORT) {
+  throw new Error("La variable PORT no está definida en el .env");
+}
 
 app.use(express.json());
 app.use("/docs", express.static("docs"));
