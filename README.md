@@ -1,46 +1,72 @@
 # parqueJurasico-API
 
+REST API for managing the dinosaurs, enclosures, incidents, and users of a
+Jurassic park.
 
-### Before execution run
-> npm install sequelize
-> npm install express
+## Requirements
 
-### Run the API in development
+- Node.js and npm
+- PostgreSQL
 
-From the project root, start the server with:
+## Setup
+
+1. Install the dependencies from the project root:
 
 ```sh
-npm run dev
+   npm install
 ```
 
-### Seed the database
+2. Set up a local PostgreSQL database. The connection is configured in
+   `src/db/connection.ts` (database, user, password, host, and port).
+   Adjust those values for your environment before starting the API.
 
-From the project root, run the TypeScript seed script with:
+3. Create a `.env` file in the root with the variables used by the application:
+
+```env
+   PORT=3000
+   JWT_SECRET="(your chosen secret key here)"
+```
+
+## Loading the sample data
+
+From the project root, run:
 
 ```sh
 npm run db:seed
 ```
 
-This uses Sequelize to recreate the tables and insert the sample data. Because
-the seed calls `sequelize.sync({ force: true })`, it drops and recreates existing
-tables; do not run it against a database whose data you need to keep.
+The seed drops and recreates the tables (`sequelize.sync({ force: true })`)
+and loads sample data. This deletes any existing data.
 
-## Add connection.ts file to src/db folder
+It also creates these test users:
 
-import { Sequelize } from "sequelize";
+| Email | Password | Role |
+|---|---|---|
+| `rex@example.com` | `password` | `user` |
+| `tric@example.com` | `password` | `admin` |
 
-// Connection to PostgreSQL.
-// Before using, create an empty database in pgAdmin called `dino-park`.
-// 👇 Change this info for the one that corresponds to your postgres
-const DATABASE = "parkManagement";
-const USER = "your-user-name";
-const PASSWORD = "your-password"; // use the password you choose when you installed Posgres
-const HOST = "localhost";
-const PORT = 5432;
+Passwords are stored using bcrypt.
 
-export const sequelize = new Sequelize(DATABASE, USER, PASSWORD, {
-  dialect: "postgres",
-  host: HOST,
-  port: PORT,
-  logging: false, // poné `console.log` si querés ver el SQL que genera Sequelize
-});
+## Running the API
+
+After setting up PostgreSQL and the `.env` file, start the server in
+development mode:
+
+```sh
+npm run dev
+```
+
+The application uses the port defined in `PORT`. The interactive Swagger
+documentation will be available at `http://localhost:<PORT>/api-docs`, for example
+`http://localhost:3000/api-docs`.
+
+## Technical decisions
+
+- **TypeScript and Express:** implementation of the HTTP API and its routes.
+- **PostgreSQL and Sequelize:** relational persistence and model definition.
+- **bcrypt:** password storage as hashes, not as plain text.
+- **JWT:** authentication using tokens with a one-hour lifetime.
+- **Swagger UI:** interactive documentation available at `/api-docs`.
+
+Authentication routes are mounted under `/auth`; for example,
+`POST /auth/register` and `POST /auth/login`.
