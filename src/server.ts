@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.route.js";
 import dinosaurRoutes from "./routes/dinosaur.routes.js";
 import incidentRoutes from "./routes/incident.routes.js";
 import recintRoutes from "./routes/recint.routes.js";
+import "dotenv/config"
 
 const app = express();
 const PORT = 3000;

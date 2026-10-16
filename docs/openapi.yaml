@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: "3.0.3"
 info:
   title: Parque de Dinosaurs API
   version: 1.0.0
@@ -291,6 +291,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
+          description: Dinosaur or enclosure not found
           content:
             application/json:
               schema:
@@ -386,7 +387,56 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
 
-    /incidents/{id}:
+  /incidents:
+    get:
+      tags: [Incidents]
+      summary: List all incidents
+      responses:
+        '200':
+          description: List of incidents
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Incident'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Incidents]
+      summary: Report an incident
+      description: |
+        Any authenticated user can report an incident. The date_time is set
+        by the server and the reporter is taken from the token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentCreate'
+      responses:
+        '201':
+          description: Incident created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Dinosaur or recint not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /incidents/{id}:
     parameters:
       - $ref: '#/components/parameters/IncidentId'
     get:
@@ -416,7 +466,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/IncidentInput'
-    responses:
+      responses:
         '200':
           description: Incident updated
           content:
@@ -442,7 +492,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/IncidentPatch'
-
       responses:
         '200':
           description: Incident updated
@@ -473,32 +522,32 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-components: 
-
-parameters: 
-  recintId:
-    name: id
-    in: path
-    required: true
-    schema: 
-    type: integer
-    minimum: 1
-  DinosaurId:
-    name: id
-    in: path
-    required: true
-    schema:
-    type: integer
-    minimum: 1
-  IncidentId:
-    name: id
-    in: path
-    required: true
-    minimum: 1
+components:
+  parameters:
+    RecintsId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    DinosaurId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    IncidentId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
     Page:
       name: page
       in: query
-      required: false
       description: Page number, starting at 1
       schema:
         type: integer
@@ -507,15 +556,99 @@ parameters:
     Limit:
       name: limit
       in: query
-      required: false
       description: Maximum number of results per page
       schema:
         type: integer
         minimum: 1
         maximum: 100
         default: 10
-
-
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [username, email, password]
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    UserResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        user:
+          type: object
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          type: object
+    Recint:
+      type: object
+      properties:
+        recint_id:
+          type: integer
+          readOnly: true
+        security:
+          type: string
+        capacity:
+          type: integer
+        status:
+          type: integer
+    Recints:
+      allOf:
+        - $ref: '#/components/schemas/Recint'
+    RecintInput:
+      type: object
+      required: [security, capacity, status]
+      properties:
+        security:
+          type: string
+        capacity:
+          type: integer
+        status:
+          type: integer
+    RecintsInput:
+      allOf:
+        - $ref: '#/components/schemas/RecintInput'
+    RecintPatch:
+      type: object
+      minProperties: 1
+      properties:
+        security:
+          type: string
+        capacity:
+          type: integer
+        status:
+          type: integer
+    Dinosaur:
+      type: object
+      properties:
+        dino_id:
+          type: integer
+          readOnly: true
+        species:
+          type: string
+        name:
+          type: string
+        recint_id:
+          type: integer
     DinosaurInput:
       type: object
       additionalProperties: false
@@ -530,7 +663,6 @@ parameters:
         recint_id:
           type: integer
           minimum: 1
-
     DinosaurPatch:
       type: object
       minProperties: 1
@@ -545,7 +677,6 @@ parameters:
         recint_id:
           type: integer
           minimum: 1
-
     DinosaurSearchResponse:
       type: object
       required: [data, pagination]
@@ -570,7 +701,6 @@ parameters:
             totalPages:
               type: integer
               minimum: 0
-
     Incident:
       type: object
       required: [incident_id, date_time, description, dino_id, recint_id]
@@ -592,7 +722,6 @@ parameters:
         recint_id:
           type: integer
           minimum: 1
-
     IncidentInput:
       type: object
       additionalProperties: false
@@ -610,7 +739,20 @@ parameters:
         recint_id:
           type: integer
           minimum: 1
-
+    IncidentCreate:
+      type: object
+      additionalProperties: false
+      required: [description, dino_id, recint_id]
+      properties:
+        description:
+          type: string
+          minLength: 1
+        dino_id:
+          type: integer
+          minimum: 1
+        recint_id:
+          type: integer
+          minimum: 1
     IncidentPatch:
       type: object
       minProperties: 1
@@ -628,7 +770,6 @@ parameters:
         recint_id:
           type: integer
           minimum: 1
-
     ErrorResponse:
       type: object
       required: [error]
@@ -636,3 +777,19 @@ parameters:
         error:
           type: string
           example: Resource not found
+  responses:
+    BadRequest:
+      description: Invalid request
+    Unauthorized:
+      description: Authentication is required
+    Forbidden:
+      description: The authenticated user is not allowed to perform this action
+    NotFound:
+      description: The requested resource was not found
+    Conflict:
+      description: The request conflicts with the current resource state
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

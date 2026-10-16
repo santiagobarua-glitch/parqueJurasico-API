@@ -8,10 +8,9 @@ interface DinoFilters{
     page: number
     limit: number
 }
-
-export const DinoRepository ={
-    async findAll(filters: DinoFilters){
-        const {species, name, recint_id, page, limit} = filters
+    export async function dinosFindAll(filters: DinoFilters){
+        
+    const {species, name, recint_id, page, limit} = filters
 
     const where: {
       specie?: object | string;
@@ -46,9 +45,9 @@ return{
         page, limit, total: result.count, totalPages: Math.ceil(result.count / limit )
          }
        }
-     },
+}
 
-async findById(id: number){
+export async function dinosFindById(id: number){
     const dino = await Dinos.findByPk(id);
     if(!dino) return null; 
     return{
@@ -57,8 +56,9 @@ async findById(id: number){
         name: dino.name,
         recint: dino.recint_id 
         }
-    },
-async create( data: {
+    }
+
+export async function dinosCreate( data: {
     species: string,
     name: string,
     recint_id: number
@@ -74,9 +74,10 @@ async create( data: {
         name: dino.name,
         recint: dino.recint_id
     }
-},
-async update(
-    id: number,
+}
+
+export async function dinosUpdate(
+   id: number,
     data: {species?: string, name?: string, recint_id?: number}
 ){
     const dino = await Dinos.findByPk(id);
@@ -93,14 +94,14 @@ async update(
       dino_id: dino.dino_id,
       species: dino.specie,
       name: dino.name,
-      recint_id: dino.recint_id,
+      recint: dino.recint_id,
     };
-  },
-async delete(id: number){
+  }
+
+export async function dinosDelete(id: number){
     const dino = await Dinos.findByPk(id);
 
     if (!dino) return false;
     await dino.destroy();
     return true;
     }
-};

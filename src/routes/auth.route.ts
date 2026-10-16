@@ -1,12 +1,12 @@
-import { Router } from "express";
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { User } from '../models/Users.js'
+import { Router, type Request, type Response } from "express";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { User } from "../models/Users.js";
 
 const router = Router();
 
 
-router.post('/register', async (req, res) => {
+router.post("/register", async (req: Request, res: Response) => {
   const { email, password, role = 'user' } = req.body;
   try {
     const passwordHash = await bcrypt.hash(password, 10);
@@ -20,7 +20,7 @@ router.post('/register', async (req, res) => {
 
 
 
-router.post('/login', async (req, res) => {
+router.post("/login", async (req: Request, res: Response) => {
   const { email, password } = req.body;
   try {
     const usuario = await User.findOne({ where: { email } });

@@ -43,7 +43,7 @@ async function seed() {
 
     const users = await User.bulkCreate([
       { email: "rex@example.com", password_hash: passwordHash, role: "user" },
-      { email: "tric@example.com", password_hash: passwordHash, role: "user" },
+      { email: "tric@example.com", password_hash: passwordHash, role: "admin" },
     ]);
 
     await Incident.bulkCreate(incidentRows as unknown as CreationAttributes<Incident>[]);
@@ -52,6 +52,8 @@ async function seed() {
     console.log(`  ${await Recints.count()} recintos`);
     console.log(`  ${await Dinos.count()} dinosaurios`);
     console.log(`  ${await Incident.count()} incidentes`);
+    console.log(`  ${await User.count()} users`);
+
     
   } finally {
     await sequelize.close();
