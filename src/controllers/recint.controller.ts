@@ -13,7 +13,7 @@ export async function getRecints(req: Request, res: Response) {
     const status =
       typeof req.query.status === "string" ? Number(req.query.status) : undefined;
     if (status !== undefined && !Number.isInteger(status)) {
-      res.status(400).json({ message: "Parámetros de búsqueda inválidos" });
+      res.status(400).json({ message: "Invalid search parameters" });
       return;
     }
 
@@ -24,7 +24,7 @@ export async function getRecints(req: Request, res: Response) {
     });
     res.status(200).json({ data: recints });
   } catch {
-    res.status(500).json({ message: "Error al obtener recintos" });
+    res.status(500).json({ message: "Error retrieving enclosures" });
   }
 }
 
@@ -32,19 +32,19 @@ export async function getRecintByID(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id < 1) {
-      res.status(400).json({ message: "ID inválido" });
+      res.status(400).json({ message: "Invalid ID" });
       return;
     }
 
     const recint = await getRecint(id);
     if (!recint) {
-      res.status(404).json({ message: "Recinto no encontrado" });
+      res.status(404).json({ message: "Enclosure not found" });
       return;
     }
 
     res.status(200).json(recint);
   } catch {
-    res.status(500).json({ message: "Error al obtener el recinto" });
+    res.status(500).json({ message: "Error retrieving the enclosure" });
   }
 }
 
@@ -62,7 +62,7 @@ export async function postRecint(req: Request, res: Response) {
       Number(capacity) < 1 ||
       !Number.isInteger(status)
     ) {
-      res.status(400).json({ message: "Datos del recinto inválidos" });
+      res.status(400).json({ message: "Invalid enclosure data" });
       return;
     }
 
@@ -73,7 +73,7 @@ export async function postRecint(req: Request, res: Response) {
     });
     res.status(201).json(recint);
   } catch {
-    res.status(500).json({ message: "Error al crear el recinto" });
+    res.status(500).json({ message: "Error creating the enclosure" });
   }
 }
 
@@ -81,7 +81,7 @@ export async function patchRecint(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id < 1) {
-      res.status(400).json({ message: "ID inválido" });
+      res.status(400).json({ message: "Invalid ID" });
       return;
     }
 
@@ -98,7 +98,7 @@ export async function patchRecint(req: Request, res: Response) {
       (status !== undefined && !Number.isInteger(status)) ||
       (security === undefined && capacity === undefined && status === undefined)
     ) {
-      res.status(400).json({ message: "Datos de actualización inválidos" });
+      res.status(400).json({ message: "Invalid update data" });
       return;
     }
 
@@ -108,13 +108,13 @@ export async function patchRecint(req: Request, res: Response) {
       ...(typeof status === "number" ? { status } : {}),
     });
     if (!recint) {
-      res.status(404).json({ message: "Recinto no encontrado" });
+      res.status(404).json({ message: "Enclosure not found" });
       return;
     }
 
     res.status(200).json(recint);
   } catch {
-    res.status(500).json({ message: "Error al actualizar el recinto" });
+    res.status(500).json({ message: "Error updating the enclosure" });
   }
 }
 
@@ -122,22 +122,22 @@ export async function deleteRecint(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id < 1) {
-      res.status(400).json({ message: "ID inválido" });
+      res.status(400).json({ message: "Invalid ID" });
       return;
     }
 
     const deleted = await removeRecint(id);
     if (!deleted) {
-      res.status(404).json({ message: "Recinto no encontrado" });
+      res.status(404).json({ message: "Enclosure not found" });
       return;
     }
 
     res.status(204).send();
   } catch (error) {
     if (error instanceof RecintInUseError) {
-      res.status(409).json({ message: error.message });
+      res.status(409).json({ message: "Enclosure has associated resources" });
       return;
     }
-    res.status(500).json({ message: "Error al eliminar el recinto" });
+    res.status(500).json({ message: "Error deleting the enclosure" });
   }
 }

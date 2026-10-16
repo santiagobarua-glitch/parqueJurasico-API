@@ -25,13 +25,13 @@ export function authenticateToken(
     : undefined;
 
   if (!token) {
-    res.status(401).json({ message: "Token de autenticación requerido" });
+    res.status(401).json({ message: "Authentication token required" });
     return;
   }
 
   const secret = process.env.JWT_SECRET;
   if (!secret) {
-    res.status(500).json({ message: "La autenticación no está configurada" });
+    res.status(500).json({ message: "Authentication is not configured" });
     return;
   }
 
@@ -42,26 +42,26 @@ export function authenticateToken(
       typeof decoded.email !== "string" ||
       typeof decoded.role !== "string"
     ) {
-      res.status(401).json({ message: "Token de autenticación inválido" });
+      res.status(401).json({ message: "Invalid authentication token" });
       return;
     }
 
     req.user = { email: decoded.email, role: decoded.role };
     next();
   } catch {
-    res.status(401).json({ message: "Token de autenticación inválido" });
+    res.status(401).json({ message: "Invalid authentication token" });
   }
 }
 
 export function authorizeRole(role: string) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      res.status(401).json({ message: "Autenticación requerida" });
+      res.status(401).json({ message: "Authentication required" });
       return;
     }
 
     if (req.user.role !== role) {
-      res.status(403).json({ message: "Permisos insuficientes" });
+      res.status(403).json({ message: "Insufficient permissions" });
       return;
     }
 

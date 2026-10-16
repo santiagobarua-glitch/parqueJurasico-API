@@ -27,7 +27,7 @@ export async function getDinos (req: Request, res: Response) {
       (recintId !== undefined &&
         (!Number.isInteger(recintId) || recintId < 1))
     ) {
-      res.status(400).json({ message: "Parámetros de búsqueda inválidos" });
+      res.status(400).json({ message: "Invalid search parameters" });
       return;
     }
 
@@ -39,7 +39,7 @@ export async function getDinos (req: Request, res: Response) {
 
     res.status(200).json(result);
   } catch {
-    res.status(500).json({ message: "Error al obtener dinosaurios" });
+    res.status(500).json({ message: "Error retrieving dinosaurs" });
   }
 };
 
@@ -49,20 +49,20 @@ export async function getDinoByID (req: Request, res: Response) {
     const id = Number(req.params.id);
 
     if (!Number.isInteger(id) || id < 1) {
-      res.status(400).json({ message: "ID inválido" });
+      res.status(400).json({ message: "Invalid ID" });
       return;
     }
 
     const dino = await getDino(id);
 
     if (!dino) {
-      res.status(404).json({ message: "Dinosaurio no encontrado" });
+      res.status(404).json({ message: "Dinosaur not found" });
       return;
     }
 
     res.status(200).json(dino);
   } catch {
-    res.status(500).json({ message: "Error al obtener el dinosaurio" });
+    res.status(500).json({ message: "Error retrieving the dinosaur" });
   }
 };
 
@@ -82,7 +82,7 @@ export async function getDinoByID (req: Request, res: Response) {
       !Number.isInteger(recint_id) ||
       Number(recint_id) < 1
     ) {
-      res.status(400).json({ message: "Datos del dinosaurio inválidos" });
+      res.status(400).json({ message: "Invalid dinosaur data" });
       return;
     }
 
@@ -95,10 +95,10 @@ export async function getDinoByID (req: Request, res: Response) {
     res.status(201).json(dino);
   } catch (error) {
     if (error instanceof RecintNotFoundError) {
-      res.status(400).json({ message: error.message });
+      res.status(400).json({ message: "Enclosure not found" });
       return;
     }
-    res.status(500).json({ message: "Error al crear el dinosaurio" });
+    res.status(500).json({ message: "Error creating the dinosaur" });
   }
 };
 
@@ -107,7 +107,7 @@ export async function patchDino (req: Request, res: Response) {
       const id = Number(req.params.id);
 
       if (!Number.isInteger(id) || id < 1) {
-        res.status(400).json({ message: "ID inválido" });
+        res.status(400).json({ message: "Invalid ID" });
         return;
       }
 
@@ -125,7 +125,7 @@ export async function patchDino (req: Request, res: Response) {
           (!Number.isInteger(recint_id) || Number(recint_id) < 1)) ||
         (species === undefined && name === undefined && recint_id === undefined)
       ) {
-        res.status(400).json({ message: "Datos de actualización inválidos" });
+        res.status(400).json({ message: "Invalid update data" });
         return;
       }
 
@@ -136,17 +136,17 @@ export async function patchDino (req: Request, res: Response) {
       });
 
       if (!dino) {
-        res.status(404).json({ message: "Dinosaurio no encontrado" });
+        res.status(404).json({ message: "Dinosaur not found" });
         return;
       }
 
       res.status(200).json(dino);
     } catch (error) {
       if (error instanceof RecintNotFoundError) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ message: "Enclosure not found" });
         return;
       }
-      res.status(500).json({ message: "Error al actualizar el dinosaurio" });
+      res.status(500).json({ message: "Error updating the dinosaur" });
     }
 };
 
@@ -156,22 +156,21 @@ export async function patchDino (req: Request, res: Response) {
       const id = Number(req.params.id);
 
       if (!Number.isInteger(id) || id < 1) {
-        res.status(400).json({ message: "ID inválido" });
+        res.status(400).json({ message: "Invalid ID" });
         return;
       }
 
       const deleted = await removeDino(id);
 
       if (!deleted) {
-        res.status(404).json({ message: "Dinosaurio no encontrado" });
+        res.status(404).json({ message: "Dinosaur not found" });
         return;
       }
 
       res.status(204).send();
     } catch {
       res.status(500).json({
-        message: "Error al eliminar el dinosaurio",
+        message: "Error deleting the dinosaur",
       });
     }
   };
-
