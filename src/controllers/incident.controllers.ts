@@ -33,7 +33,7 @@ export async function getIncidents(req: Request, res: Response) {
       limit > 100 ||
       (recintId !== undefined && (!Number.isInteger(recintId) || recintId < 1))
     ) {
-      res.status(400).json({ message: "Parámetros de búsqueda inválidos" });
+      res.status(400).json({ message: "Invalid search parameters" });
       return;
     }
     const result = await listIncidents({
@@ -44,7 +44,7 @@ export async function getIncidents(req: Request, res: Response) {
     });
     res.status(200).json(result);
 } catch {
-    res.status(500).json({ message: "Error al obtener dinosaurios" });
+    res.status(500).json({ message: "Error retrieving incidents" });
 }
 }
 
@@ -52,19 +52,19 @@ export async function getIncidentByID (req: Request, res: Response){
   try {
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id < 1) {
-      res.status(400).json({ message: "ID inválido" });
+      res.status(400).json({ message: "Invalid ID" });
       return;
     }
 
     const incident = await findIncidentById(id);
     if (!incident) {
-      res.status(404).json({ message: "Incidente no encontrado" });
+      res.status(404).json({ message: "Incident not found" });
       return;
     }
 
     res.status(200).json(incident);
   } catch {
-    res.status(500).json({ message: "Error al obtener el incidente" });
+    res.status(500).json({ message: "Error retrieving the incident" });
   }
 };
 
@@ -72,11 +72,11 @@ export async function postIncident (req: Request, res: Response) {
     try {
       const body = getBody(req);
       if (!body) {
-        res.status(400).json({ message: "Datos del incidente inválidos" });
+        res.status(400).json({ message: "Invalid incident data" });
         return;
       }
       if (!req.user?.email) {
-        res.status(401).json({ message: "Autenticación requerida" });
+        res.status(401).json({ message: "Authentication required" });
         return;
       }
       const {description, dino_id, recint_id } = body;
@@ -88,7 +88,7 @@ export async function postIncident (req: Request, res: Response) {
         !isPositiveId(dino_id) ||
         !isPositiveId(recint_id)
       ) {
-        res.status(400).json({ message: "Datos del incidente inválidos" });
+        res.status(400).json({ message: "Invalid incident data" });
         return;
       }
 
@@ -102,10 +102,10 @@ export async function postIncident (req: Request, res: Response) {
       res.status(201).json(incident);
     } catch (error) {
       if (error instanceof ForeignKeyConstraintError) {
-        res.status(404).json({ message: "Dinosaurio o recinto no encontrado" });
+        res.status(404).json({ message: "Dinosaur or enclosure not found" });
         return;
       }
-      res.status(500).json({ message: "Error al crear el incidente" });
+      res.status(500).json({ message: "Error creating the incident" });
     }
   };
 
@@ -113,13 +113,13 @@ export async function postIncident (req: Request, res: Response) {
     try {
       const id = Number(req.params.id);
       if (!Number.isInteger(id) || id < 1) {
-        res.status(400).json({ message: "ID inválido" });
+        res.status(400).json({ message: "Invalid ID" });
         return;
       }
 
       const body = getBody(req);
       if (!body) {
-        res.status(400).json({ message: "Datos de actualización inválidos" });
+        res.status(400).json({ message: "Invalid update data" });
         return;
       }
       const { date_time, description, dino_id, recint_id } = body;
@@ -134,7 +134,7 @@ export async function postIncident (req: Request, res: Response) {
           dino_id === undefined &&
           recint_id === undefined)
       ) {
-        res.status(400).json({ message: "Datos de actualización inválidos" });
+        res.status(400).json({ message: "Invalid update data" });
         return;
       }
 
@@ -147,17 +147,17 @@ export async function postIncident (req: Request, res: Response) {
         ...(recint_id !== undefined ? { recint_id } : {}),
       });
       if (!incident) {
-        res.status(404).json({ message: "Incidente no encontrado" });
+        res.status(404).json({ message: "Incident not found" });
         return;
       }
 
       res.status(200).json(incident);
     } catch (error) {
       if (error instanceof ForeignKeyConstraintError) {
-        res.status(404).json({ message: "Dinosaurio o recinto no encontrado" });
+        res.status(404).json({ message: "Dinosaur or enclosure not found" });
         return;
       }
-      res.status(500).json({ message: "Error al actualizar el incidente" });
+      res.status(500).json({ message: "Error updating the incident" });
     }
   };
 
@@ -165,13 +165,13 @@ export async function editIncident (req: Request, res: Response) {
     try {
       const id = Number(req.params.id);
       if (!Number.isInteger(id) || id < 1) {
-        res.status(400).json({ message: "ID inválido" });
+        res.status(400).json({ message: "Invalid ID" });
         return;
       }
 
       const body = getBody(req);
       if (!body) {
-        res.status(400).json({ message: "Datos de actualización inválidos" });
+        res.status(400).json({ message: "Invalid update data" });
         return;
       }
       const { date_time, description, dino_id, recint_id } = body;
@@ -186,7 +186,7 @@ export async function editIncident (req: Request, res: Response) {
           dino_id === undefined &&
           recint_id === undefined)
       ) {
-        res.status(400).json({ message: "Datos de actualización inválidos" });
+        res.status(400).json({ message: "Invalid update data" });
         return;
       }
 
@@ -199,17 +199,17 @@ export async function editIncident (req: Request, res: Response) {
         ...(recint_id !== undefined ? { recint_id } : {}),
       });
       if (!incident) {
-        res.status(404).json({ message: "Incidente no encontrado" });
+        res.status(404).json({ message: "Incident not found" });
         return;
       }
 
       res.status(200).json(incident);
     } catch (error) {
       if (error instanceof ForeignKeyConstraintError) {
-        res.status(404).json({ message: "Dinosaurio o recinto no encontrado" });
+        res.status(404).json({ message: "Dinosaur or enclosure not found" });
         return;
       }
-      res.status(500).json({ message: "Error al actualizar el incidente" });
+      res.status(500).json({ message: "Error updating the incident" });
     }
   };
 
@@ -217,19 +217,19 @@ export async function deleteIncident (req: Request, res: Response) {
     try {
       const id = Number(req.params.id);
       if (!Number.isInteger(id) || id < 1) {
-        res.status(400).json({ message: "ID inválido" });
+        res.status(400).json({ message: "Invalid ID" });
         return;
       }
 
       const deleted = await removeIncident(id);
       if (!deleted) {
-        res.status(404).json({ message: "Incidente no encontrado" });
+        res.status(404).json({ message: "Incident not found" });
         return;
       }
 
       res.status(204).send();
     } catch {
-      res.status(500).json({ message: "Error al eliminar el incidente" });
+      res.status(500).json({ message: "Error deleting the incident" });
     }
   };
 
@@ -261,4 +261,3 @@ function isDateTime(value: unknown): value is string {
 function isPositiveId(value: unknown): value is number {
   return Number.isInteger(value) && Number(value) > 0;
 }
-
