@@ -15,7 +15,7 @@ router.post("/register", async (req: Request, res: Response) => {
   typeof password !== "string" ||
   !password
   ) {
-  return res.status(400).json({ message: "Email and password are required." });
+  return res.status(400).json({ message: "Bad request" });
   }
 
   try {
